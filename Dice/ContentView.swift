@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var randomNumber = 1
-    @State var timer: Timer?
+    @State private var randomNumber = 1
+    @State private var timer: Timer?
+    @State private var isRolling = false
     var body: some View {
         VStack {
             Spacer()
@@ -20,25 +21,32 @@ struct ContentView: View {
                 .padding()
             Spacer()
             Button{
-                print("ボタンが押されたよ")
-                timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true){ _ in
-                    randomNumber = Int.random(in: 1...6)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                        timer?.invalidate()
-                        timer = nil
-                    }
-                }
+                playDice()
             } label: {
                 Text("サイコロを振る").padding()
                     .background(Color.orange)
                     .foregroundColor(.black)
                     .cornerRadius(10)
-            }
+            }.disabled(isRolling)
             Spacer()
         }
         .padding()
     }
+    private func playDice(){
+        print("ボタンが押されたよ")
+        isRolling = true
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true){ _ in
+            randomNumber = Int.random(in: 1...6)
+        }
+        // Timerが0.5秒後に停止する処理
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+            timer?.invalidate()
+            timer = nil
+            isRolling = false
+        }
+    }
 }
+
 
 #Preview {
     ContentView()
